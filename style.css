@@ -1,0 +1,50 @@
+#calculator {
+  height: 70vh;
+  width: 40vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  border: 1px black solid;
+  grid-template-areas:
+    'display display display display'
+    'exponent factorial delete clear'
+    'reciprocal root percent plus-minus'
+    'one two three divide'
+    'four five six multiply'
+    'seven eight nine subtract'
+    'zero decimal equals add';
+}
+.button {
+  border: 1px black solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.special {
+  background-color: red;
+}
+.operator {
+  background-color: green;
+}
+.number {
+  background-color: blue;
+}
+#display {
+  grid-area: display;
+  font-size: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+#exponent {
+  grid-area: exponent;
+}
+#factorial {
+  grid-area: factorial;
+}
+#delete {
+  grid-area: delete;
+}
+#clear {
+  grid-area: clear;
+}
