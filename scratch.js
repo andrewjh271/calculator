@@ -2,7 +2,8 @@ function respondToClick(e) {
   let target = e.target.id;
   console.log(target);
   switch(target) {
-    case(!isNaN || '.'):
+    case(!isNaN):
+    case('.'):
       elements[elements.length - 1] += target;
       break;
     case('clear'):
