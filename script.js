@@ -4,78 +4,107 @@ calculator.addEventListener('click', respondToClick);
 
 const display = document.querySelector('#display');
 
-let elements = [''];
+let elements = ['0'];
+// let clearOnClick = false;
+let clearOnNumber = false;
 
-
+display.textContent = elements.join(' ');
 function respondToClick(e) {
+  // if(clearOnClick) {
+  //   elements = ['0'];
+  //   clearOnClick = false;
+  // }
   let target = e.target.id;
   console.log(target);
-  if(!isNaN(target)) elements[elements.length - 1] += target;
-  else {
+  if(!isNaN(target)) {
+    if(clearOnNumber) {
+      elements = ['0'];
+      clearOnNumber = false
+    }
+    if(elements[0] == '0' && elements.length == 1) {
+      elements = [target];
+      //replace 0 with first number
+    } else {
+      elements[elements.length - 1] += target;
+    }
+  } else if(target == '.') {
+    if(clearOnNumber) {
+      elements = ['0'];
+      clearOnNumber = false
+    }
+    if(elements[elements.length-1].indexOf('.') == '-1') {
+      if(elements[elements.length-1] == '') elements[elements.length - 1] = 0 + target;
+      else elements[elements.length - 1] += target;
+    } else return;
+  } else if(elements[0] == '0' && elements.length == 1) {
+    return;
+  } else {
+    clearOnNumber = false;
     switch(target) {
-      case('.'):
-        elements[elements.length - 1] += target;
-        break;
       case('clear'):
         console.log(elements[elements.length - 1]);
-        elements = [''];
-        //clear display
+        elements = ['0'];
+        // clearOnClick = true;
         break;
       case('delete'):
         backSpace();
         break;
       case('equals'):
         operate();
-        console.log(elements.join(' ')); //temporary
-        //immediate operators: factorial, plus-minus, root, percent, reciprocal:
+        console.log(elements.join(' '));
+        clearOnNumber = true;
         break;
+      //immediate operators: factorial, plus-minus, root, percent, reciprocal:
       case('factorial'):
         elements[elements.length-1] = factorial(elements[elements.length-1]);
-        elements.push('');
+        clearOnNumber = true;
         break;
       case('plus-minus'):
+        if(elements[elements.length-1] == '') break;
         elements[elements.length-1] = +(elements[elements.length-1]) * -1;
-        elements.push('');
         break;
       case('root'):
         elements[elements.length-1] = squareRoot(elements[elements.length-1]);
-        elements.push('');
+        clearOnNumber = true;
         break;
       case('percent'):
         elements[elements.length-1] = +(elements[elements.length-1] * 0.01);
-        elements.push('');
+        clearOnNumber = true;
         break;
       case('reciprocal'):
         elements[elements.length-1] = reciprocal(elements[elements.length-1]);
-        elements.push('');
+        clearOnNumber = true;
         break;
       //all other operators:
       default:
+        if(elements[elements.length-1] == '') {
+          elements[elements.length-1] = target;
+          elements.push('');
+        }
+        else {
         elements.push(target);
         elements.push('');
+        }
     }
   }
+  showDisplay();
+}
+function showDisplay() {
+  elements.forEach(element => element = round(element));
   display.textContent = elements.join(' ');
 }
 function backSpace() {
-  
-  if(elements[elements.length - 1]) {
+  if(elements[0] == '0' && elements.length == 1) return;
+  if(elements[elements.length - 1] !== '0') {
     elements[elements.length-1] = elements[elements.length-1].toString();
     elements[elements.length - 1] = elements[elements.length - 1].slice(0, (elements[elements.length - 1].length - 1));
   } else {
         elements.pop();
         if(elements.length !== 0) backSpace();
-        else return;
+        else elements = ['0']
   }
+  if(!elements[0]) elements[0] = '0';
 }
-
-// let operators = {
-//   1: '^',
-//   2: '*',
-//   3: '÷',
-//   4: '+',
-//   5: '-',
-// }
 let operators = ['^', '*', '÷', '+', '-'];
 function operate() {
   operators.forEach(function(operator) {
@@ -106,27 +135,9 @@ function operate() {
     }
   })
 }
-
-
-// function operator(sign, a, b) {
-//   switch(sign) {
-//     case('+'):
-//       return add(a, b);
-//       break;
-//     case('-'):
-//       return subtract(a, b);
-//       break;
-//     case('*'):
-//       return multiply(a,b);
-//       break;
-//     case('/'):
-//       return divide(a,b);
-//       break;
-//     default:
-//       console.error('No match for first argument (sign)')
-//   }
-// }
-
+function round(num) {
+  return Math.round(num * 10000) / 10000;
+}
 function factorial(num) {
   for(let i = num-1; i > 1; i--) {
     num *= i;
@@ -134,10 +145,10 @@ function factorial(num) {
   return num;
 }
 function squareRoot(num) {
-  return Math.round(Math.sqrt(num) * 100) / 100;
+  return round(Math.sqrt(num));
 }
 function reciprocal(num) {
-  return Math.round(1 / num * 100) / 100;
+  return round(1/num)
 }
 function power(a, b) {
   return a ** b;
