@@ -5,15 +5,11 @@ calculator.addEventListener('click', respondToClick);
 const display = document.querySelector('#display');
 
 let elements = ['0'];
-// let clearOnClick = false;
 let clearOnNumber = false;
+let zeroError = false;
 
 display.textContent = elements.join(' ');
 function respondToClick(e) {
-  // if(clearOnClick) {
-  //   elements = ['0'];
-  //   clearOnClick = false;
-  // }
   let target = e.target.id;
   console.log(target);
   if(!isNaN(target)) {
@@ -44,7 +40,6 @@ function respondToClick(e) {
       case('clear'):
         console.log(elements[elements.length - 1]);
         elements = ['0'];
-        // clearOnClick = true;
         break;
       case('delete'):
         backSpace();
@@ -76,7 +71,7 @@ function respondToClick(e) {
         clearOnNumber = true;
         break;
       //all other operators:
-      default:
+      default: //if current element is empty, add operator to it, otherwise push operator into new element
         if(elements[elements.length-1] == '') {
           elements[elements.length-1] = target;
           elements.push('');
@@ -90,8 +85,8 @@ function respondToClick(e) {
   showDisplay();
 }
 function showDisplay() {
-  elements.forEach(element => element = round(element));
-  display.textContent = elements.join(' ');
+  if(!zeroError) display.textContent = elements.join(' ');
+  else zeroError = false;
 }
 function backSpace() {
   if(elements[0] == '0' && elements.length == 1) return;
@@ -119,6 +114,12 @@ function operate() {
           elements[index - 1] = multiply(elements[index - 1], elements[index + 1]);
           break;
         case('÷'):
+          if(elements[index + 1] == 0) {
+            display.textContent = 'Sometimes the impossible really is impossible';
+            zeroError = true;
+            elements = ['0'];
+            return;
+          }
           elements[index - 1] = divide(elements[index - 1], elements[index + 1]);
           break;
         case('+'):
@@ -136,7 +137,7 @@ function operate() {
   })
 }
 function round(num) {
-  return Math.round(num * 10000) / 10000;
+  return Math.round(num * 100000000) / 100000000;
 }
 function factorial(num) {
   for(let i = num-1; i > 1; i--) {
@@ -163,5 +164,5 @@ function multiply(a, b) {
   return a * b;
 }
 function divide(a, b) {
-  return a / b;
+  return round(a / b);
 }
