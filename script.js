@@ -4,135 +4,182 @@ calculator.addEventListener('click', respondToClick);
 
 const display = document.querySelector('#display');
 
-let elements = ['0'];
-let clearOnNumber = false;
-let zeroError = false;
+let components = [''];
 
-display.textContent = elements.join(' ');
+let clearOnNumber = false;
+let errorMessage = false;
+
+let operators = ['^', '*', '÷', '+', '-']; //does not include immediate operators
+
+showDisplay();
+
 function respondToClick(e) {
   let target = e.target.id;
+  if(target == 'display' || target == 'calculator') return;
   console.log(target);
   if(!isNaN(target)) {
     if(clearOnNumber) {
-      elements = ['0'];
+      components = [''];
       clearOnNumber = false
     }
-    if(elements[0] == '0' && elements.length == 1) {
-      elements = [target];
-      //replace 0 with first number
-    } else {
-      elements[elements.length - 1] += target;
-    }
+    components[components.length - 1] += target;
   } else if(target == '.') {
     if(clearOnNumber) {
-      elements = ['0'];
+      components = [''];
       clearOnNumber = false
     }
-    if(elements[elements.length-1].indexOf('.') == '-1') {
-      if(elements[elements.length-1] == '') elements[elements.length - 1] = 0 + target;
-      else elements[elements.length - 1] += target;
+    if(components[components.length-1].indexOf('.') == '-1') {
+      if(components[components.length - 1] == '') components[components.length - 1] = 0 + target;
+      else components[components.length - 1] += target;
     } else return;
-  } else if(elements[0] == '0' && elements.length == 1) {
-    return;
   } else {
     clearOnNumber = false;
     switch(target) {
       case('clear'):
-        console.log(elements[elements.length - 1]);
-        elements = ['0'];
-        break;
+        console.log(components[components.length - 1]);
+        components = [''];
+        showDisplay();
+        return;
       case('delete'):
         backSpace();
-        break;
+        showDisplay();
+        return;
+    }
+    if(components == '') return;
+    //all other options are operators... check if last item in components[] is an operator; 
+    //if so replace that with new operator. (immediate operators don't need to be looked for)
+    operators.forEach(function(operator) {
+      if((components[components.length - 2] == operator) && (components[components.length - 1] == '')) {
+        components.pop();
+        components.pop();
+        console.log(`found ${operator}`);
+      }
+    })
+    switch(target) {
       case('equals'):
         operate();
-        console.log(elements.join(' '));
+        console.log(components.join(' '));
         clearOnNumber = true;
         break;
       //immediate operators: factorial, plus-minus, root, percent, reciprocal:
       case('factorial'):
-        elements[elements.length-1] = factorial(elements[elements.length-1]);
+        components[components.length-1] = factorial(components[components.length-1]);
         clearOnNumber = true;
         break;
       case('plus-minus'):
-        if(elements[elements.length-1] == '') break;
-        elements[elements.length-1] = +(elements[elements.length-1]) * -1;
+        if(components[components.length-1] == '') break;
+        components[components.length-1] = +(components[components.length-1]) * -1;
         break;
       case('root'):
-        elements[elements.length-1] = squareRoot(elements[elements.length-1]);
+        components[components.length-1] = squareRoot(components[components.length-1]);
         clearOnNumber = true;
         break;
       case('percent'):
-        elements[elements.length-1] = +(elements[elements.length-1] * 0.01);
+        components[components.length-1] = +(components[components.length-1] * 0.01);
         clearOnNumber = true;
         break;
       case('reciprocal'):
-        elements[elements.length-1] = reciprocal(elements[elements.length-1]);
+        components[components.length-1] = reciprocal(components[components.length-1]);
         clearOnNumber = true;
         break;
       //all other operators:
-      default: //if current element is empty, add operator to it, otherwise push operator into new element
-        if(elements[elements.length-1] == '') {
-          elements[elements.length-1] = target;
-          elements.push('');
+      default: //if current component is empty, add operator to it, otherwise push operator into new component
+        if(components[components.length-1] == '') {
+          components[components.length-1] = target;
+          components.push('');
         }
         else {
-        elements.push(target);
-        elements.push('');
+        components.push(target);
+        components.push('');
         }
     }
   }
   showDisplay();
 }
+
 function showDisplay() {
-  if(!zeroError) display.textContent = elements.join(' ');
-  else zeroError = false;
+  if(!errorMessage) {
+    if(components == '') {
+      display.textContent = 0;
+      return;
+    }
+    let currentDisplay = components.join(' ');
+    if(currentDisplay.length < 16) {
+      display.style = 'font-size: 5.5vh';
+    }
+    else if(currentDisplay.length < 40) {
+      display.style = 'font-size: 4vh';
+    } else if(currentDisplay.length < 50) {
+      display.style = 'font-size: 3vh';
+    } else {
+      display.style = 'font-size: 2vh';
+    }
+    let longest = components.reduce((a, b) => `${a}`.length > `${b}`.length ? a : b);
+    longest = `${longest}`;
+    if(longest.length < 15) {
+      //do nothing
+    } else if(longest.length < 20) {
+      display.style = 'font-size: 4vh';
+    } else if(longest.length < 27) {
+      display.style = 'font-size: 3vh';
+    } else if(longest.length < 34) {
+      display.style = 'font-size: 2.4vh';
+    } else if (longest.length < 47) {
+      display.style = 'font-size: 1.7vh';
+    } else {
+      display.style = 'font-size: 2.4vh';
+      display.textContent = 'Error: Your ambition is greater than that of this calculator.';
+      errorMessage = true;
+      components = [''];
+      return;
+    }
+    console.log(`Longest component is ${longest}`);
+    display.textContent = currentDisplay;
+  } else errorMessage = false;
 }
 function backSpace() {
-  if(elements[0] == '0' && elements.length == 1) return;
-  if(elements[elements.length - 1] !== '0') {
-    elements[elements.length-1] = elements[elements.length-1].toString();
-    elements[elements.length - 1] = elements[elements.length - 1].slice(0, (elements[elements.length - 1].length - 1));
+  if(components == '') return;
+  if(components[components.length - 1] !== '') {
+    components[components.length-1] = components[components.length-1].toString();
+    components[components.length - 1] = components[components.length - 1].slice(0, (components[components.length - 1].length - 1));
   } else {
-        elements.pop();
-        if(elements.length !== 0) backSpace();
-        else elements = ['0']
+    components.pop();
+    backSpace();
   }
-  if(!elements[0]) elements[0] = '0';
 }
-let operators = ['^', '*', '÷', '+', '-'];
 function operate() {
   operators.forEach(function(operator) {
-    let index = elements.findIndex(element => element == operator);
+    let index = components.findIndex(component => component == operator);
     console.log(index);
     while(index !== -1) {
       switch(operator) {
         case('^'):
-          elements[index - 1] = power(elements[index - 1], elements[index + 1]);
+          components[index - 1] = power(components[index - 1], components[index + 1]);
           break;
         case('*'):
-          elements[index - 1] = multiply(elements[index - 1], elements[index + 1]);
+          components[index - 1] = multiply(components[index - 1], components[index + 1]);
           break;
         case('÷'):
-          if(elements[index + 1] == 0) {
-            display.textContent = 'Sometimes the impossible really is impossible';
-            zeroError = true;
-            elements = ['0'];
+          if(components[index + 1] == 0) {
+            display.style = 'font-size: 2.4vh';
+            display.textContent = 'Sometimes the impossible really is impossible.';
+            errorMessage = true;
+            components = [''];
             return;
           }
-          elements[index - 1] = divide(elements[index - 1], elements[index + 1]);
+          components[index - 1] = divide(components[index - 1], components[index + 1]);
           break;
         case('+'):
-          elements[index - 1] = add(elements[index - 1], elements[index + 1]);
+          components[index - 1] = add(components[index - 1], components[index + 1]);
           break;
         case('-'):
-          elements[index - 1] = subtract(elements[index - 1], elements[index + 1]);
+          components[index - 1] = subtract(components[index - 1], components[index + 1]);
           break;
         default:
           console.error('Operator not found.');
       }
-      elements.splice(index, 2);
-      index = elements.findIndex(element => element == operator);
+      components.splice(index, 2);
+      index = components.findIndex(component => component == operator);
     }
   })
 }
@@ -140,12 +187,27 @@ function round(num) {
   return Math.round(num * 100000000) / 100000000;
 }
 function factorial(num) {
-  for(let i = num-1; i > 1; i--) {
+  if(!Number.isInteger(+num) || num > 100 || num < 0) {
+    display.style = 'font-size: 2.4vh';
+    display.textContent = 'Error: Your ambition is greater than that of this calculator.';
+    errorMessage = true;
+    components = [''];
+    return;
+  }
+  else if(num == 0) return 1;
+  for(let i = num - 1; i > 0; i--) {
     num *= i;
   }
   return num;
 }
 function squareRoot(num) {
+  if(num < 0) {
+    display.style = 'font-size: 2.4vh; color: red';
+    display.textContent = 'Error: Your ambition is greater than that of this calculator.';
+    errorMessage = true;
+    components = [''];
+    return;
+  }
   return round(Math.sqrt(num));
 }
 function reciprocal(num) {
