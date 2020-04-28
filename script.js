@@ -15,6 +15,8 @@ showDisplay();
 
 function respondToClick(e) {
   let target = e.target.id;
+  console.log(e);
+  if(e.target.className == "fas fa-backspace") target='delete';
   if(target == 'display' || target == 'calculator') return;
   console.log(target);
   if(!isNaN(target)) {
@@ -131,9 +133,9 @@ function showDisplay() {
       display.textContent = 'Error: Your ambition is greater than that of this calculator.';
       errorMessage = true;
       components = [''];
+      display.style = 'font-size: 5.5vh';
       return;
     }
-    console.log(`Longest component is ${longest}`);
     display.textContent = currentDisplay;
   } else errorMessage = false;
 }
