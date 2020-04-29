@@ -1,4 +1,4 @@
-//add key functionality; fix display behavior; add background
+//add background
 
 const calculator = document.querySelector('#calculator');
 calculator.addEventListener('click', respondToClick);
@@ -9,7 +9,7 @@ const display = document.querySelector('#display');
 
 let components = [''];
 let validKeys = ['^', '!', 'Backspace', 'c', '%', '-', '1', '2', '3', '4', '5',
- '6', '7', '8', '9', '0', '*', 'x', '.', '=', 'Enter', '+'];
+ '6', '7', '8', '9', '0', '*', 'x', '/', '.', '=', 'Enter', '+'];
 
 let clearOnNumber = false;
 let errorMessage = false;
@@ -23,6 +23,7 @@ function respondToKey(e) {
   let userKey = validKeys.find(key => (e.key == key));
   if(userKey == 'Enter') userKey = '=';
   else if(userKey == 'x') userKey = '*';
+  else if(userKey == '/') userKey = '÷'
   if(userKey) {
     let activeButton = document.querySelector(`.button[id='${userKey}']`);
     let currentClass;
@@ -39,13 +40,19 @@ function respondToKey(e) {
 }
 function respondToClick(e, keyValue) {
   let target;
-  console.log(e);
+  // console.log(e);
+  if(errorMessage) {
+    display.style = 'font-size: 5.5vh; color: black';
+    display.textContent = 0;
+    errorMessage = false;
+    return;
+  }
   if(keyValue) target = keyValue;
   else target = e.target.id;
   console.log(e.target);
   if(e.target.className == "fas fa-backspace") target='Backspace';
   if(target == 'display' || target == 'calculator') return;
-  console.log(target);
+  // console.log(target);
   if(!isNaN(target)) {
     if(clearOnNumber) {
       components = [''];
@@ -139,28 +146,18 @@ function showDisplay() {
       return;
     }
     let currentDisplay = components.join(' ');
-    if(currentDisplay.length < 16) {
-      display.style = 'font-size: 5.5vh';
-    }
-    else if(currentDisplay.length < 40) {
-      display.style = 'font-size: 4vh';
-    } else if(currentDisplay.length < 50) {
-      display.style = 'font-size: 3vh';
-    } else {
-      display.style = 'font-size: 2vh';
-    }
     let longest = components.reduce((a, b) => `${a}`.length > `${b}`.length ? a : b);
     longest = `${longest}`;
-    if(longest.length < 15) {
-      //do nothing
-    } else if(longest.length < 20) {
+    if(currentDisplay.length < 14 && longest.length < 6) {
+      display.style = 'font-size: 5.5vh';
+    } else if(currentDisplay.length < 20 && longest.length < 10) {
       display.style = 'font-size: 4vh';
-    } else if(longest.length < 27) {
+    } else if(currentDisplay.length < 50 && longest.length < 20) {
       display.style = 'font-size: 3vh';
-    } else if(longest.length < 34) {
-      display.style = 'font-size: 2.4vh';
-    } else if (longest.length < 47) {
-      display.style = 'font-size: 1.7vh';
+    } else if(currentDisplay.length < 100 && longest.length < 30) {
+      display.style = 'font-size: 2vh';
+    } else if(currentDisplay.length < 150 && longest.length < 45) {
+      display.style = 'font-size: 1.5vh';
     } else {
       display.style = 'font-size: 2.4vh; color: red';
       display.textContent = 'Error: Your ambition is greater than that of this calculator.';
@@ -168,9 +165,12 @@ function showDisplay() {
       components = [''];
       return;
     }
+    console.log(`total length is ${currentDisplay.length}`);
+    console.log(`longest string length is ${longest.length}`);
     display.textContent = currentDisplay;
   } else {
-    errorMessage = false;
+    // errorMessage = false;
+    // do nothing;
   }
 }
 function backSpace() {
