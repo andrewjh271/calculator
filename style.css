@@ -3,6 +3,11 @@ html, body {
   font-family: 'Manrope', sans-serif;
   /* font-family: 'Playfair Display', serif; */
 }
+#container {
+  background-image: linear-gradient(45deg,#0058ca94, #13d4e2d7, #b424ad23);
+  width: 100vw;
+  height: 100vh;
+}
 sup {
   font-size: 2vh;
   position: relative;
@@ -95,7 +100,7 @@ sub {
 }
 #display {
   grid-area: display;
-  font-size: 44px;
+  font-size: 5.5vh;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;

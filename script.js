@@ -1,5 +1,3 @@
-//add background
-
 const calculator = document.querySelector('#calculator');
 calculator.addEventListener('click', respondToClick);
 
@@ -35,24 +33,21 @@ function respondToKey(e) {
     setTimeout(function() {
       activeButton.classList.remove(`${currentClass}-active`)
     }, 100);
-    
   }
 }
 function respondToClick(e, keyValue) {
   let target;
-  // console.log(e);
   if(errorMessage) {
-    display.style = 'font-size: 5.5vh; color: black';
+    display.style = 'font-size: 5.5vh; color: #403e46';
     display.textContent = 0;
     errorMessage = false;
     return;
   }
   if(keyValue) target = keyValue;
   else target = e.target.id;
-  console.log(e.target);
   if(e.target.className == "fas fa-backspace") target='Backspace';
+  console.log(target);
   if(target == 'display' || target == 'calculator') return;
-  // console.log(target);
   if(!isNaN(target)) {
     if(clearOnNumber) {
       components = [''];
@@ -87,13 +82,15 @@ function respondToClick(e, keyValue) {
         clearOnNumber = true;
       } else return;
     }
-    //all other options are operators... check if last item in components[] is an operator; 
-    //if so replace that with new operator. (immediate operators don't need to be looked for)
+    // All other options are operators... check if last item in components[] is an operator; 
+    // if so replace that with new operator. (Immediate operators don't need to be looked for.)
+    // Since my non-immediate operators push a new empty item into my components[] arary,
+    // I need to remove two items, not just one.
     operators.forEach(function(operator) {
       if((components[components.length - 2] == operator) && (components[components.length - 1] == '')) {
         components.pop();
         components.pop();
-        console.log(`found ${operator}`);
+        console.log(`Found ${operator}`);
       }
     })
     switch(target) {
@@ -141,7 +138,7 @@ function respondToClick(e, keyValue) {
 function showDisplay() {
   if(!errorMessage) {
     if(components == '') {
-      display.style = 'font-size: 5.5vh; color: black';
+      display.style = 'font-size: 5.5vh; color: #403e46';
       display.textContent = 0;
       return;
     }
@@ -149,15 +146,15 @@ function showDisplay() {
     let longest = components.reduce((a, b) => `${a}`.length > `${b}`.length ? a : b);
     longest = `${longest}`;
     if(currentDisplay.length < 14 && longest.length < 6) {
-      display.style = 'font-size: 5.5vh';
+      display.style = 'font-size: 5.5vh; color: #403e46';
     } else if(currentDisplay.length < 20 && longest.length < 10) {
-      display.style = 'font-size: 4vh';
+      display.style = 'font-size: 4vh; color: #403e46';
     } else if(currentDisplay.length < 50 && longest.length < 20) {
-      display.style = 'font-size: 3vh';
+      display.style = 'font-size: 3vh; color: #403e46';
     } else if(currentDisplay.length < 100 && longest.length < 30) {
-      display.style = 'font-size: 2vh';
+      display.style = 'font-size: 2vh; color: #403e46';
     } else if(currentDisplay.length < 150 && longest.length < 45) {
-      display.style = 'font-size: 1.5vh';
+      display.style = 'font-size: 1.5vh; color: #403e46';
     } else {
       display.style = 'font-size: 2.4vh; color: red';
       display.textContent = 'Error: Your ambition is greater than that of this calculator.';
@@ -165,11 +162,10 @@ function showDisplay() {
       components = [''];
       return;
     }
-    console.log(`total length is ${currentDisplay.length}`);
-    console.log(`longest string length is ${longest.length}`);
+    console.log(`Total length of display is ${currentDisplay.length}.`);
+    console.log(`Length of longest string is ${longest.length}.`);
     display.textContent = currentDisplay;
   } else {
-    // errorMessage = false;
     // do nothing;
   }
 }
