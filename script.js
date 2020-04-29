@@ -1,10 +1,15 @@
+//add key functionality; fix display behavior; add background
 
 const calculator = document.querySelector('#calculator');
 calculator.addEventListener('click', respondToClick);
 
+window.addEventListener('keydown', respondToKey);
+
 const display = document.querySelector('#display');
 
 let components = [''];
+let validKeys = ['^', '!', 'Backspace', 'c', '%', '-', '1', '2', '3', '4', '5',
+ '6', '7', '8', '9', '0', '*', 'x', '.', '=', 'Enter', '+'];
 
 let clearOnNumber = false;
 let errorMessage = false;
@@ -13,10 +18,32 @@ let operators = ['^', '*', '÷', '+', '-']; //does not include immediate operato
 
 showDisplay();
 
-function respondToClick(e) {
-  let target = e.target.id;
+function respondToKey(e) {
+  console.log(e.key);
+  let userKey = validKeys.find(key => (e.key == key));
+  if(userKey == 'Enter') userKey = '=';
+  else if(userKey == 'x') userKey = '*';
+  if(userKey) {
+    let activeButton = document.querySelector(`.button[id='${userKey}']`);
+    let currentClass;
+    if(activeButton.classList.contains('number')) currentClass = 'number';
+    else if(activeButton.classList.contains('operator')) currentClass = 'operator';
+    else currentClass = 'special';
+    activeButton.classList.add(`${currentClass}-active`);
+    respondToClick(e, userKey);
+    setTimeout(function() {
+      activeButton.classList.remove(`${currentClass}-active`)
+    }, 100);
+    
+  }
+}
+function respondToClick(e, keyValue) {
+  let target;
   console.log(e);
-  if(e.target.className == "fas fa-backspace") target='delete';
+  if(keyValue) target = keyValue;
+  else target = e.target.id;
+  console.log(e.target);
+  if(e.target.className == "fas fa-backspace") target='Backspace';
   if(target == 'display' || target == 'calculator') return;
   console.log(target);
   if(!isNaN(target)) {
@@ -37,17 +64,22 @@ function respondToClick(e) {
   } else {
     clearOnNumber = false;
     switch(target) {
-      case('clear'):
+      case('c'):
         console.log(components[components.length - 1]);
         components = [''];
         showDisplay();
         return;
-      case('delete'):
+      case('Backspace'):
         backSpace();
         showDisplay();
         return;
     }
-    if(components == '') return;
+    if(components == '') {
+      if(target == '!') {
+        components[components.length-1] = 1;
+        clearOnNumber = true;
+      } else return;
+    }
     //all other options are operators... check if last item in components[] is an operator; 
     //if so replace that with new operator. (immediate operators don't need to be looked for)
     operators.forEach(function(operator) {
@@ -58,13 +90,13 @@ function respondToClick(e) {
       }
     })
     switch(target) {
-      case('equals'):
+      case('='):
         operate();
         console.log(components.join(' '));
         clearOnNumber = true;
         break;
-      //immediate operators: factorial, plus-minus, root, percent, reciprocal:
-      case('factorial'):
+      //immediate operators: !, plus-minus, root, %, reciprocal:
+      case('!'):
         components[components.length-1] = factorial(components[components.length-1]);
         clearOnNumber = true;
         break;
@@ -76,7 +108,7 @@ function respondToClick(e) {
         components[components.length-1] = squareRoot(components[components.length-1]);
         clearOnNumber = true;
         break;
-      case('percent'):
+      case('%'):
         components[components.length-1] = +(components[components.length-1] * 0.01);
         clearOnNumber = true;
         break;
@@ -102,6 +134,7 @@ function respondToClick(e) {
 function showDisplay() {
   if(!errorMessage) {
     if(components == '') {
+      display.style = 'font-size: 5.5vh; color: black';
       display.textContent = 0;
       return;
     }
@@ -129,15 +162,16 @@ function showDisplay() {
     } else if (longest.length < 47) {
       display.style = 'font-size: 1.7vh';
     } else {
-      display.style = 'font-size: 2.4vh';
+      display.style = 'font-size: 2.4vh; color: red';
       display.textContent = 'Error: Your ambition is greater than that of this calculator.';
       errorMessage = true;
       components = [''];
-      display.style = 'font-size: 5.5vh';
       return;
     }
     display.textContent = currentDisplay;
-  } else errorMessage = false;
+  } else {
+    errorMessage = false;
+  }
 }
 function backSpace() {
   if(components == '') return;
@@ -163,7 +197,7 @@ function operate() {
           break;
         case('÷'):
           if(components[index + 1] == 0) {
-            display.style = 'font-size: 2.4vh';
+            display.style = 'font-size: 2.4vh; color: red';
             display.textContent = 'Sometimes the impossible really is impossible.';
             errorMessage = true;
             components = [''];
@@ -190,7 +224,7 @@ function round(num) {
 }
 function factorial(num) {
   if(!Number.isInteger(+num) || num > 100 || num < 0) {
-    display.style = 'font-size: 2.4vh';
+    display.style = 'font-size: 2.4vh; color: red';
     display.textContent = 'Error: Your ambition is greater than that of this calculator.';
     errorMessage = true;
     components = [''];

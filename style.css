@@ -30,7 +30,7 @@ sub {
   grid-template-rows: 1.3fr repeat(6, 1fr);
   /* border: 1px black solid; */
   border-radius: 12px;
-  box-shadow: 12px 3px 38px 9px #23b8ea96;
+  box-shadow: 4px 12px 13px 0px #23eaa596;
   
   grid-template-areas:
     'display display display display'
@@ -71,7 +71,7 @@ sub {
 .special {
   background-color: darkmagenta
 }
-.special:active {
+.special:active, .special-active {
   box-shadow: inset 0px 0px 16px 7px rgba(214, 156, 16, 0.68);
   background-color: #ca1313;
   text-decoration: none;
@@ -81,7 +81,7 @@ sub {
 .operator {
   background-color: rgb(12, 104, 73);
 }
-.operator:active {
+.operator:active, .operator-active {
   background-color: rgb(12, 104, 73);
   box-shadow: inset 0px 0px 16px 5px rgba(8, 216, 75, 0.61);
   background-color: #38c3ecd6;
@@ -89,7 +89,7 @@ sub {
 .number {
   background-color: rgb(10, 91, 212);
 }
-.number:active {
+.number:active, .number-active {
   box-shadow: inset 0px 0px 16px 5px rgba(129, 8, 216, 0.32);
   background-color: #8073efdb;
 }
@@ -100,7 +100,6 @@ sub {
   align-items: flex-end;
   justify-content: flex-end;
   background-image: url(dust_scratches.png);
-  /* background-size: 100vw 100vh; */
   background-repeat: no-repeat;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -110,13 +109,13 @@ sub {
 #exponent {
   grid-area: exponent;
 }
-#factorial {
+.factorial {
   grid-area: factorial;
 }
-#delete {
+#Backspace {
   grid-area: delete;
 }
-#clear {
+#c {
   grid-area: clear;
 }
 .zero {
