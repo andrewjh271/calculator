@@ -187,19 +187,11 @@ function operate() {
       switch(operator) {
         case('^'):
           components[index - 1] = power(components[index - 1], components[index + 1]);
+          components.splice(index, 2);
           break;
         case('*'):
-          components[index - 1] = multiply(components[index - 1], components[index + 1]);
-          break;
         case('÷'):
-          if(components[index + 1] == 0) {
-            display.style = 'font-size: 2.4vh; color: red';
-            display.textContent = 'Sometimes the impossible really is impossible.';
-            errorMessage = true;
-            components = [''];
-            return;
-          }
-          components[index - 1] = divide(components[index - 1], components[index + 1]);
+          if(operateMultiplyDivide() == 'Error') return;
           break;
         case('+'):
         case('-'):
@@ -208,10 +200,29 @@ function operate() {
         default:
           console.error('Operator not found.');
       }
-      components.splice(index, 2);
       index = components.findIndex(component => component == operator);
     }
   })
+}
+function operateMultiplyDivide() {
+  let index = components.findIndex(component => component == '*' || component == '÷');
+  while(index !== -1) {
+    if(components[index] == '*')
+      components[index - 1] = multiply(components[index - 1], components[index + 1]);
+    else if(components[index] == '÷') {
+      if(components[index + 1] == 0) {
+        display.style = 'font-size: 2.4vh; color: red';
+        display.textContent = 'Sometimes the impossible really is impossible.';
+        errorMessage = true;
+        components = [''];
+        return 'Error';
+      }
+      components[index - 1] = divide(components[index - 1], components[index + 1]);
+    } else 
+      console.error('* or ÷ not found');
+    components.splice(index, 2);
+    index = components.findIndex(component => component == '*' || component == '÷');
+  }
 }
 function operatePlusMinus() {
   let index = components.findIndex(component => component == '+' || component == '-');
@@ -221,7 +232,7 @@ function operatePlusMinus() {
     else if(components[index] == '-')
       components[index - 1] = subtract(components[index - 1], components[index + 1]);
     else 
-      console.error('Plus or minus not found');
+      console.error('+ or - not found');
     components.splice(index, 2);
     index = components.findIndex(component => component == '+' || component == '-');
   }
@@ -241,7 +252,7 @@ function factorial(num) {
   for(let i = num - 1; i > 0; i--) {
     num *= i;
   }
-  return num;
+  return round(num);
 }
 function squareRoot(num) {
   if(num < 0) {
@@ -257,16 +268,16 @@ function reciprocal(num) {
   return round(1/num)
 }
 function power(a, b) {
-  return a ** b;
+  return round(a ** b);
 }
 function add(a, b) {
-  return +a + +b;
+  return round(+a + +b);
 }
 function subtract(a, b) {
-  return a - b;
+  return round(a - b);
 }
 function multiply(a, b) {
-  return a * b;
+  return round(a * b);
 }
 function divide(a, b) {
   return round(a / b);
