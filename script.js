@@ -202,10 +202,8 @@ function operate() {
           components[index - 1] = divide(components[index - 1], components[index + 1]);
           break;
         case('+'):
-          components[index - 1] = add(components[index - 1], components[index + 1]);
-          break;
         case('-'):
-          components[index - 1] = subtract(components[index - 1], components[index + 1]);
+          operatePlusMinus();
           break;
         default:
           console.error('Operator not found.');
@@ -214,6 +212,19 @@ function operate() {
       index = components.findIndex(component => component == operator);
     }
   })
+}
+function operatePlusMinus() {
+  let index = components.findIndex(component => component == '+' || component == '-');
+  while(index !== -1) {
+    if(components[index] == '+')
+      components[index - 1] = add(components[index - 1], components[index + 1]);
+    else if(components[index] == '-')
+      components[index - 1] = subtract(components[index - 1], components[index + 1]);
+    else 
+      console.error('Plus or minus not found');
+    components.splice(index, 2);
+    index = components.findIndex(component => component == '+' || component == '-');
+  }
 }
 function round(num) {
   return Math.round(num * 100000000) / 100000000;
